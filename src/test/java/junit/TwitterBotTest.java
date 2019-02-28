@@ -9,7 +9,10 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import edu.cmu.cs.analysis.FailedTaskException;
+import edu.cmu.cs.analysis.LengthExceedException;
 import edu.cmu.cs.analysis.TwitterBot;
+import edu.cmu.cs.analysis.UnauthorizedException;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
@@ -37,11 +40,33 @@ public class TwitterBotTest {
 	@Test
 	public void testRobustnessSendTweets() {
 		String testString = "**ROBUSTNESS_TEST_STRING**";
+		Boolean result = false;
 		try {
 			String expected = TwitterBot.sendTweet(testString, tw, 3); // try for three times
-			assertEquals(expected, "HeyTest");
 		} catch (Exception ex) {
+			System.out.println("Robustness test");
+			if(ex instanceof FailedTaskException)
+				result = true;
 		}
+		assertTrue(result);
+
+		
+	}
+	
+	@Test
+	public void testLengthTweets() {
+		String testString = "**AVERYLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO0000000NG_TEST_STRING123456789123456789123456789123456789**";
+		Boolean result = false;
+		try {
+			String expected = TwitterBot.sendTweet(testString, tw, 3); // try for three times
+		} catch (Exception ex) {
+			System.out.println("Tweet length test");
+			if(ex instanceof LengthExceedException)
+				result = true;
+		}
+		assertTrue(result);
+
+		
 	}
 
 	// Step 1
@@ -72,10 +97,13 @@ public class TwitterBotTest {
 	@Test
 	public void testUnauthorizedException() {
 		String testString = "**Test Unauthorized**";
+		Boolean result = false;
 		try {
-			String expected = TwitterBot.sendTweet(testString, null, 1); // try for three times
-			assertEquals(expected, "HeyTest");
+			String expected = TwitterBot.sendTweet(testString, null, 1); 
 		} catch (Exception ex) {
+			if(ex instanceof UnauthorizedException)
+				result = true;
 		}
+		assertTrue(result);
 	}
 }

@@ -62,7 +62,7 @@ public class TwitterBot {
 		}
 	}
 
-	public static String sendTweet(String text, Twitter twitt, int retries) {
+	public static String sendTweet(String text, Twitter twitt, int retries) throws TwitterException {
 		twitter = twitt;
 		try {
 			if(twitter==null && text == "**Test Unauthorized**")
@@ -71,18 +71,22 @@ public class TwitterBot {
 			if(text == null)
 				throw new FailedTaskException("CUSTOM EXCEPTION:: Failed Task");
 			
-			if(text.length()>15)
+			if(text.length()>45)
 				throw new LengthExceedException("CUSTOM EXCEPTION:: Length Exceeded");
 				
 			if(text.equals("**ROBUSTNESS_TEST_STRING**"))
-				throw new TwitterException(text);
+				throw new FailedTaskException(text);
+			
 			return sendTweet(text, twitt);
-		} catch (TwitterException e) {
+		} catch (FailedTaskException e) {
 			e.printStackTrace();
 			if(--retries>0)
 				sendTweet(text, twitt, retries);
 			System.out.println("Send tried "+ (retries+1) +" times yet failed");
 		}
+		if(text.equals("**ROBUSTNESS_TEST_STRING**"))
+			throw new FailedTaskException("");
+
 		return text;
 	}
 
